@@ -31,7 +31,7 @@ jobs:
 
       - name: Build
         working-directory: fady-portfolio
-        run: npm run build -- --base=/My-Portfolio/
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
