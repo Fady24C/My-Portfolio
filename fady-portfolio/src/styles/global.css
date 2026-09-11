@@ -1,0 +1,158 @@
+/* ============================================================================
+   GLOBAL.CSS — base styles, palette, buttons, header, loader, page transition
+   ----------------------------------------------------------------------------
+   PALETTE (change once here, applies everywhere):
+     --bg      #F5F2EB  background
+     --ink     #1A1A1A  text & buttons
+     --accent  #A1AE89  hover & selection color
+   ============================================================================ */
+:root {
+  --bg: #F5F2EB;
+  --ink: #1A1A1A;
+  --accent: #A1AE89;
+  --accent-soft: rgba(161, 174, 137, 0.35);
+  --cream: #F5F2EB;
+  --radius: 18px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-logo: 'Dancing Script', cursive;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Selection color = accent */
+::selection { background: var(--accent); color: var(--ink); }
+
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; }
+a { color: inherit; }
+
+main { padding-top: 76px; } /* room for the fixed glass header */
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--ink); color: var(--bg);
+  border: 1px solid var(--ink); border-radius: 999px;
+  padding: 14px 30px; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+.btn:hover { background: var(--accent); border-color: var(--accent); color: var(--ink); transform: translateY(-2px); }
+.btn-small { padding: 9px 20px; font-size: 0.85rem; }
+.btn-big   { padding: 18px 42px; font-size: 1.05rem; }
+
+/* ---------- Scroll reveal (used by <Reveal>) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(42px);
+  transition: opacity 0.8s ease var(--reveal-delay, 0ms),
+              transform 0.8s ease var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ---------- Glassy header ---------- */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 5vw;
+  background: transparent; /* the glass layer lives on ::before (below) */
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+}
+/* IMPORTANT: the glass effect lives on a pseudo-element, NOT on .site-header.
+   An element with backdrop-filter becomes the containing block for
+   position:fixed descendants — that would shrink the full-screen mobile
+   menu to the header bar's size and leave its links visibly overflowing. */
+.site-header::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  background: rgba(245, 242, 235, 0.72); /* same color as bg, semi-transparent */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.logo {
+  position: relative; z-index: 101; /* stay above the open mobile menu */
+  background: none; border: none; padding: 0 4px;
+  font-family: var(--font-logo); font-size: 2rem; font-weight: 700; line-height: 1;
+  color: var(--ink);
+  transition: color 0.3s ease;
+}
+.logo:hover { color: var(--accent); }
+.site-header nav { display: flex; align-items: center; gap: 28px; }
+.site-header nav .nav-link {
+  background: none; border: none; padding: 4px 0;
+  color: var(--ink); font-size: 0.92rem; font-weight: 500; letter-spacing: 0.02em;
+  position: relative;
+}
+.site-header nav .nav-link::after { /* underline grows on hover */
+  content: ''; position: absolute; left: 0; bottom: 0;
+  width: 0; height: 2px; background: var(--accent);
+  transition: width 0.3s ease;
+}
+.site-header nav .nav-link:hover::after { width: 100%; }
+
+/* Hamburger — hidden on desktop */
+.burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; z-index: 101; }
+.burger span { width: 24px; height: 2px; background: var(--ink); transition: transform 0.3s ease, opacity 0.3s ease; }
+.site-header.menu-open .burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.site-header.menu-open .burger span:nth-child(2) { opacity: 0; }
+.site-header.menu-open .burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ---------- Intro loader (0% -> 100% + project photos) ---------- */
+.loader {
+  position: fixed; inset: 0; z-index: 300; background: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+}
+.loader-photos { position: relative; width: min(46vw, 420px); aspect-ratio: 4 / 3; }
+.loader-photos img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; border-radius: var(--radius);
+  opacity: 0; transform: scale(1.05);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.loader-photos img.is-active { opacity: 1; transform: scale(1); }
+.loader-empty {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-family: var(--font-logo); font-size: 4rem; color: var(--accent);
+  border: 1px dashed var(--accent); border-radius: var(--radius);
+}
+.loader-bottom {
+  position: absolute; left: 5vw; right: 5vw; bottom: 32px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  color: var(--bg);
+}
+.loader-brand { font-size: 0.85rem; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.7; }
+.loader-count { font-size: clamp(3rem, 8vw, 6rem); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* ---------- Page transition: "crafting the next page" ---------- */
+.transition-overlay {
+  position: fixed; inset: 0; z-index: 250; background: var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.transition-overlay.is-active { opacity: 1; visibility: visible; }
+.transition-circle {
+  width: 140px; height: 140px; border-radius: 50%;
+  border: 1px solid rgba(245, 242, 235, 0.35);
+  display: grid; place-items: center;
+  transform: scale(0.6); opacity: 0;
+}
+.transition-overlay.is-active .transition-circle { animation: circlePop 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+@keyframes circlePop { to { transform: scale(1); opacity: 1; } }
+.transition-logo { font-family: var(--font-logo); font-size: 3rem; color: var(--accent); }
+.transition-text {
+  color: var(--bg); font-size: 0.75rem; letter-spacing: 0.35em; text-transform: uppercase;
+  opacity: 0;
+}
+.transition-overlay.is-active .transition-text { animation: fadeUp 0.6s ease 0.25s forwards; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 0.85; transform: translateY(0); } }
